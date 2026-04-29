@@ -138,7 +138,7 @@ Directory naming convention: `{length}-ASP-{encoding}/`
 - `{length}`: input text length (2000, 3000, 4000, 5000, 6000, 7000, 8000, or 10000)
 - `{encoding}`: `acyclicity` or `order`
 
-Each directory contains logs for 12 representative instances. Logs at lengths 8000 and 10000 confirm that no instance could be solved within the time limit at those lengths.
+Each directory contains logs for a subset of the 46 benchmark instances tested in the scalability experiments. Logs at lengths 8000 and 10000 confirm that no instance could be solved within the time limit at those lengths.
 
 Log files are in `{dir}/bms3000/` for lengths 2000 and 3000, and in `{dir}/bms10000/` for lengths 4000 and above (one `.log.gz` per instance).
 
@@ -150,10 +150,10 @@ PDF figures included in the paper.
 
 | File | Figure |
 |------|--------|
-| `fig-bms-cactus-{100,300,500,1000}.pdf` | Cactus plots of BMS solving times by input length |
-| `fig-bms-constraints-all.pdf`           | Cactus plot of number of constraints across all BMS instances |
-| `fig-bms-variables-all.pdf`             | Cactus plot of number of variables across all BMS instances |
-| `fig-bms-upset-solver-comparison.pdf`   | UpSet plot of BMS instances solved by each solver group |
+| `fig-bms-cactus-{100,300,500,1000}.pdf` | Cactus plots of CPU time required to solve instances, sorted by CPU time, for each input length |
+| `fig-bms-constraints-all.pdf`           | Cactus plot of number of constraints in ascending order of instance size, aggregated over all benchmark instances |
+| `fig-bms-variables-all.pdf`             | Cactus plot of number of variables in ascending order of instance size, aggregated over all benchmark instances |
+| `fig-bms-upset-solver-comparison.pdf`   | UpSet plot showing the intersections of instances solved by different solver groups |
 
 ---
 

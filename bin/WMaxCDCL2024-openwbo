@@ -1,0 +1,35 @@
+#!/bin/bash
+SCRIPT_NAME=$0
+FNAME=$1
+TOPENWBO=$2
+SCRIPT_DIR=$(dirname "$SCRIPT_NAME")
+
+TMP_OUT=$(mktemp)
+
+printf "c " 1>&2
+(timeout $TOPENWBO ${SCRIPT_DIR}/open-wbo-2024 $FNAME > ${TMP_OUT}) 2> /dev/null
+CODE=$?
+echo "c " 1>&2
+if [ $CODE -ge 100 ]; then
+	echo "c Stop OpenWBO"
+	UB=`grep "^o" ${TMP_OUT} | tail -n 1 | cut -d ' ' -f 2`
+	rm ${TMP_OUT}
+	if ! [ -z "$UB" ]; then
+		UB=$((UB+1))
+		echo "c UB from OpenWBO=$UB"
+	else
+		echo "c no UB from OpenWBO"
+	fi
+	${SCRIPT_DIR}/wmaxcdcl_static-2024 $FNAME $UB
+	exit $?
+else
+	SOL=$(grep "^s" ${TMP_OUT} | cut -d ' ' -f 2)
+        cat ${TMP_OUT}
+        rm ${TMP_OUT}
+        echo "c Solved by OpenWBO"
+        if [ "$SOL" == "UNSATISFIABLE" ]; then
+                exit 20
+        else
+                exit 30
+        fi  
+fi

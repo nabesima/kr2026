@@ -1,0 +1,27 @@
+CPU time,Date,Instance,Log,Obj updates,Obj val,Real time,Result,Sys time,Time taken,Uptime,Used memory
+3586.7,2024.0,instances/bms/1000/paper1,1000-13-MaxSAT-PySAT-mgh/bms/1000/paper1.gz.log.gz,0,0,3600.3,unknown,10.2,,20.0,NaN
+3587.8,2024.0,instances/bms/1000/paper3,1000-13-MaxSAT-PySAT-mgh/bms/1000/paper3.gz.log.gz,0,0,3600.3,unknown,12.1,,18.0,NaN
+3587.1,2024.0,instances/bms/1000/book2,1000-13-MaxSAT-PySAT-mgh/bms/1000/book2.gz.log.gz,0,0,3600.6,unknown,21.3,,18.0,NaN
+3587.3,2024.0,instances/bms/1000/paper5,1000-13-MaxSAT-PySAT-mgh/bms/1000/paper5.gz.log.gz,0,0,3600.2,unknown,8.4,,19.0,NaN
+3588.2,2024.0,instances/bms/1000/progp,1000-13-MaxSAT-PySAT-mgh/bms/1000/progp.gz.log.gz,0,0,3600.3,unknown,12.4,,20.0,NaN
+3588.4,2024.0,instances/bms/1000/plrabn12.txt,1000-13-MaxSAT-PySAT-mgh/bms/1000/plrabn12.txt.gz.log.gz,0,0,3600.7,unknown,27.0,,22.0,NaN
+37.7,2024.0,instances/bms/1000/alphabet.txt,1000-13-MaxSAT-PySAT-mgh/bms/1000/alphabet.txt.gz.log.gz,1,27,38.0,opt,1.5,36.6984,18.0,NaN
+3588.4,2024.0,instances/bms/1000/pi.txt,1000-13-MaxSAT-PySAT-mgh/bms/1000/pi.txt.gz.log.gz,0,0,3600.7,unknown,25.4,,20.0,NaN
+3587.2,2024.0,instances/bms/1000/cp.html,1000-13-MaxSAT-PySAT-mgh/bms/1000/cp.html.gz.log.gz,0,0,3600.1,unknown,5.1,,20.0,NaN
+1054.7,2024.0,instances/bms/1000/random.txt,1000-13-MaxSAT-PySAT-mgh/bms/1000/random.txt.gz.log.gz,1,892,1058.5,opt,1.7,1057.7928,20.0,NaN
+3588.6,2024.0,instances/bms/1000/world192.txt,1000-13-MaxSAT-PySAT-mgh/bms/1000/world192.txt.gz.log.gz,0,0,3600.4,unknown,17.4,,21.0,NaN
+3586.5,2024.0,instances/bms/1000/paper2,1000-13-MaxSAT-PySAT-mgh/bms/1000/paper2.gz.log.gz,0,0,3600.3,unknown,12.6,,19.0,NaN
+3586.9,2024.0,instances/bms/1000/xargs.1,1000-13-MaxSAT-PySAT-mgh/bms/1000/xargs.1.gz.log.gz,0,0,3600.2,unknown,8.2,,21.0,NaN
+3588.1,2024.0,instances/bms/1000/trans,1000-13-MaxSAT-PySAT-mgh/bms/1000/trans.gz.log.gz,0,0,3600.5,unknown,20.2,,21.0,NaN
+3587.7,2024.0,instances/bms/1000/bib,1000-13-MaxSAT-PySAT-mgh/bms/1000/bib.gz.log.gz,0,0,3600.3,unknown,11.2,,18.0,NaN
+3588.1,2024.0,instances/bms/1000/news,1000-13-MaxSAT-PySAT-mgh/bms/1000/news.gz.log.gz,0,0,3600.4,unknown,13.6,,19.0,NaN
+3587.6,2024.0,instances/bms/1000/bible.txt,1000-13-MaxSAT-PySAT-mgh/bms/1000/bible.txt.gz.log.gz,0,0,3600.9,unknown,29.3,,21.0,NaN
+3586.8,2024.0,instances/bms/1000/progc,1000-13-MaxSAT-PySAT-mgh/bms/1000/progc.gz.log.gz,0,0,3600.4,unknown,14.7,,19.0,NaN
+3587.9,2024.0,instances/bms/1000/alice29.txt,1000-13-MaxSAT-PySAT-mgh/bms/1000/alice29.txt.gz.log.gz,0,0,3601.3,unknown,43.8,,20.0,NaN
+3588.5,2024.0,instances/bms/1000/obj2,1000-13-MaxSAT-PySAT-mgh/bms/1000/obj2.gz.log.gz,0,0,3600.5,unknown,16.6,,21.0,NaN
+3587.1,2024.0,instances/bms/1000/asyoulik.txt,1000-13-MaxSAT-PySAT-mgh/bms/1000/asyoulik.txt.gz.log.gz,0,0,3600.2,unknown,10.2,,21.0,NaN
+3587.6,2024.0,instances/bms/1000/paper4,1000-13-MaxSAT-PySAT-mgh/bms/1000/paper4.gz.log.gz,0,0,3600.4,unknown,15.5,,19.0,NaN
+2738.2,2024.0,instances/bms/1000/paper6,1000-13-MaxSAT-PySAT-mgh/bms/1000/paper6.gz.log.gz,0,0,2747.7,unknown,11.7,,18.0,NaN
+3587.0,2024.0,instances/bms/1000/fields.c,1000-13-MaxSAT-PySAT-mgh/bms/1000/fields.c.gz.log.gz,0,0,3600.6,unknown,19.7,,20.0,NaN
+3588.6,2024.0,instances/bms/1000/book1,1000-13-MaxSAT-PySAT-mgh/bms/1000/book1.gz.log.gz,0,0,3600.5,unknown,23.5,,19.0,NaN
+3588.5,2024.0,instances/bms/1000/grammar.lsp,1000-13-MaxSAT-PySAT-mgh/bms/1000/grammar.lsp.gz.log.gz,0,0,3600.9,unknown,32.1,,22.0,NaN

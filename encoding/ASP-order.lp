@@ -1,0 +1,1 @@
+/home/nabesima/papers/Smallest Bidirectional Macro Scheme by Answer-Set Programming/supplementary-materials/encoding/bms_order.lp

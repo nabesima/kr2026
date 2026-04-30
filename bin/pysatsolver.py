@@ -12,7 +12,7 @@ from pysat.examples.fm import FM
 from pysat.examples.lsu import LSU, LSUPlus
 from pysat.examples.rc2 import RC2, RC2Stratified
 
-# 行バッファリングを無効にする
+# Disable line buffering
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', buffering=1)
 
 def signal_handler(signum, frame):

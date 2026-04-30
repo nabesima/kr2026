@@ -4,21 +4,20 @@
 %%%
 
 #script (python)
-# clingo の Propagator とは，
-#   - ASP の grounding 後に，探索（SAT/CDNL）過程に介入できる拡張機構
-# です．
+# A Propagator in clingo is
+#   an extension mechanism that can intervene in the search (SAT/CDNL) process
+#   after ASP grounding.
 #
-# 具体的には，
-#   - init() で監視対象（watch）を登録する
-#   - propagate(control, changes) で，割当が変化した literal を受け取り，
-#     必要なら nogood（禁止節）を追加し，伝播を進める
-#   - undo() でバックトラックに合わせて内部状態を巻き戻す
-#   - check() で全割当の最終チェックを行う
-# という流れで使います．
+# Specifically, the workflow is as follows:
+#   - init() registers the literals to watch
+#   - propagate(control, changes) receives literals whose assignments have changed,
+#     and if necessary, adds nogoods (forbidden clauses) to advance propagation
+#   - undo() rolls back the internal state on backtracking
+#   - check() performs a final check on a complete assignment
 #
-# ここでは q(I,L) を watch し，
-#   q が True になった瞬間に，既存の True な q と交差していないかを調べ，
-#   交差していれば「両方 True を禁止する nogood」を追加して排除します．
+# Here, we watch q(I,L), and the moment q becomes True,
+#   we check whether it overlaps with any existing True q,
+#   and if so, add a nogood forbidding both from being True simultaneously.
 
 import sys
 from dataclasses import dataclass
@@ -28,7 +27,7 @@ from clingo.application import Application, clingo_main
 
 @dataclass(frozen=True)
 class Interval:
-    # q(I,L) に対応する参照区間 [I, I+L) を表す．
+    # Represents the reference interval [I, I+L) corresponding to q(I,L).
     i: int
     l: int
     @property
@@ -36,63 +35,62 @@ class Interval:
         return self.i + self.l  # end (exclusive)
 
 def violates_slp7(a: Interval, b: Interval) -> bool:
-    # SLP7 の交差条件（a が左，b が右と仮定）を判定する．
+    # Checks the overlap condition of SLP7 (assuming a is on the left, b is on the right).
     #
-    # SLP7（元の ASP 制約）:
+    # SLP7 (the original ASP constraint):
     #   :- q(I,L), q(J,M), I < J, J < I+L, I+L < J+M.
     #
-    # ここでは a=(I,L), b=(J,M) を仮定し，
-    #   a.i < b.i < a.j < b.j
-    # のとき True を返す．
+    # Assuming a=(I,L) and b=(J,M), returns True when
+    #   a.i < b.i < a.j < b.j.
     return (a.i < b.i) and (b.i < a.j) and (a.j < b.j)
 
 class SLP7Propagator:
     """
-    この Propagator の方針:
-      - watch: q(I,L) の solver literal を監視対象にする
-      - q(I,L) が True になったものだけを「active」として保持する
-      - 新しく True になった q が既存の active と交差するなら，
-        その 2 つが同時に True になることを禁止する nogood（[lit, lit2]）を追加する
+    Strategy of this Propagator:
+      - watch: monitor the solver literals of q(I,L)
+      - keep only those q(I,L) that are True as "active"
+      - if a newly True q overlaps with an existing active one,
+        add a nogood ([lit, lit2]) forbidding the two from being True simultaneously
 
-    nogood [lit, lit2] の意味:
-      lit=True かつ lit2=True を同時に満たす割当を禁止する（つまり両立不可）．
+    Meaning of nogood [lit, lit2]:
+      Forbids any assignment where both lit=True and lit2=True hold (i.e., they are mutually exclusive).
     """
 
     def __init__(self):
-        # lit -> Interval の対応表（solver literal をキーにする）
+        # Lookup table from solver literal to Interval
         self._lit2int: Dict[int, Interval] = {}
-        # thread_id ごとの状態（-t で並列探索できるため）
-        self._active: List[Dict[int, Interval]] = []   # lit -> Interval（true のみ）
-        self._trail:  List[List[Tuple[int,int]]] = []  # (level, lit) の履歴（backtrack 用）
+        # Per-thread state (to support parallel search with -t)
+        self._active: List[Dict[int, Interval]] = []   # lit -> Interval (only true ones)
+        self._trail:  List[List[Tuple[int,int]]] = []  # history of (level, lit) for backtracking
 
     def init(self, init):
-        # init は grounding 後に 1 回だけ呼ばれる初期化フック．
-        # ここで
-        #   - thread ごとの辞書を初期化し，
-        #   - q/2 を列挙して watch 登録する．
+        # init is an initialization hook called once after grounding.
+        # Here we
+        #   - initialize per-thread dictionaries, and
+        #   - enumerate q/2 and register watches.
         self._active = [dict() for _ in range(init.number_of_threads)]
         self._trail  = [[] for _ in range(init.number_of_threads)]
 
-        # q/2 を列挙して watch
-        # symbolic_atoms.by_signature("q",2) で grounded な q(I,L) を走査できる．
+        # Enumerate q/2 and register watches.
+        # symbolic_atoms.by_signature("q",2) iterates over all grounded q(I,L).
         for atm in init.symbolic_atoms.by_signature("q", 2):
             sym = atm.symbol
             i = sym.arguments[0].number
             l = sym.arguments[1].number
-            # atm.literal は program literal（内部表現）．
-            # Propagator の propagate() で来るのは solver literal なので，
-            # init.solver_literal(...) で変換しておく．
+            # atm.literal is the program literal (internal representation).
+            # Since propagate() receives solver literals,
+            # we convert it using init.solver_literal(...) here.
             lit = atm.literal          # program literal
             slit = init.solver_literal(lit)  # solver literal
             self._lit2int[slit] = Interval(i, l)
             init.add_watch(slit)
 
     def propagate(self, control, changes):
-        # propagate は watch している solver literal の割当が変化したときに呼ばれる．
-        # changes には変化した literal が列挙される．
+        # propagate is called when the assignment of a watched solver literal changes.
+        # changes lists the literals whose assignments have changed.
         #
-        # ここでは「True になった q(I,L)」だけを扱い，
-        # それが既存 active と交差するなら nogood を追加する．
+        # Here we handle only q(I,L) that have become True,
+        # and add a nogood if they overlap with any existing active interval.
         tid = control.thread_id
         assign = control.assignment
         level = assign.decision_level
@@ -101,54 +99,54 @@ class SLP7Propagator:
         trail  = self._trail[tid]
 
         for lit in changes:
-            # watched lit が true になったときだけ扱う
+            # Process only when the watched literal becomes true
             if assign.value(lit) != True:
                 continue
 
-            # q(I,L) に対応する区間を取り出す
+            # Retrieve the interval corresponding to q(I,L)
             itv = self._lit2int.get(lit)
             if itv is None:
                 continue
 
-            # 多重呼び出し対策（同じ lit が複数回 changes に来るケースに備える）
+            # Guard against duplicate calls (in case the same lit appears multiple times in changes)
             if lit in active:
                 continue
 
-            # 既存の true 区間との SLP7 違反検出
-            # 2区間の順序は両方向あり得るので両向きでチェック
+            # Detect SLP7 violation against existing true intervals.
+            # Both orderings of the two intervals are possible, so check both directions.
             for lit2, itv2 in active.items():
                 if violates_slp7(itv2, itv) or violates_slp7(itv, itv2):
-                    # 両方 true を禁止する nogood を追加
-                    # (lit, lit2) が同時に true なら矛盾，という節
+                    # Add a nogood forbidding both from being true simultaneously
+                    # (a clause stating that lit and lit2 cannot both be true)
                     if control.add_nogood([lit, lit2]):
                         control.propagate()
                     return
 
-            # 問題なければ active に登録し，trail に記録する
+            # If no violation, register in active and record in trail
             active[lit] = itv
             trail.append((level, lit))
 
     def undo(self, thread_id, assignment, changes):
-        # undo はバックトラック（backjump）時に呼ばれる．
-        # changes は「unassigned（未割当）に戻った watched literal」の列．
+        # undo is called on backtracking (backjump).
+        # changes is the list of watched literals that have become unassigned.
         #
-        # 最小構成としては，
-        #   - active から該当 lit を削除する
-        # だけでも整合が取れる（SLP7 は True になった区間のみを見るため）．
+        # As a minimal implementation,
+        #   - removing the relevant lit from active
+        # is sufficient for consistency (since SLP7 only examines True intervals).
         active = self._active[thread_id]
-        # changes は「unassigned になった watched lit」の列
+        # changes is the list of watched lits that became unassigned
         for lit in changes:
             if lit in active:
                 del active[lit]
 
-        # trail は厳密には decision level で切り詰めるのが筋だが，
-        # active を changes で同期できていれば最小構成としては十分．
-        # きれいにするなら assignment.decision_level を参照して trail も pop する．
+        # Strictly, the trail should be trimmed by decision level,
+        # but as long as active is kept in sync via changes, this minimal form suffices.
+        # For a cleaner implementation, pop the trail by referencing assignment.decision_level.
 
     def check(self, control):
-        # check は全割当（モデル候補）時の最終確認用．
-        # propagate だけで足りることが多いが，
-        # 念のため active 同士を総当たりで見て交差が残っていないかを確認する．
+        # check is used for final verification on a complete assignment (model candidate).
+        # propagate alone is usually sufficient,
+        # but we brute-force all pairs of active intervals as a safety check for any remaining overlaps.
         tid = control.thread_id
         active = list(self._active[tid].items())
         for idx in range(len(active)):

@@ -6,13 +6,13 @@ SCRIPT_DIR=$(dirname "$SCRIPT_NAME")
 INSTANCE=${@:$#:1}       # Last element
 OPTIONS=${@:1:(${#@}-1)} # other elements
 
-# 一時ファイルを作成
+# Create a temporary file
 TEMPFILE=$(mktemp)
 
-# スクリプト終了時に一時ファイルを削除
+# Delete the temporary file on script exit
 trap "rm -f $TEMPFILE" EXIT
 
-# 解凍して一時ファイルに保存
+# Decompress and save to the temporary file
 gunzip -c "$INSTANCE" > "$TEMPFILE"
 
 ${SCRIPT_DIR}/WMaxCDCL2024-openwbo ${OPTIONS} ${TEMPFILE} 1200

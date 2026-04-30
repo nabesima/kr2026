@@ -1,6 +1,6 @@
 %%%
-%%% Base encodng of finding smallest SLP (version 4)
-%%% Time-stamp: <2026-02-21 17:22:06 banbara>
+%%% Base encodng of finding smallest SLP (version 3)
+%%% Time-stamp: <2026-02-21 17:08:35 banbara>
 %%%
 
 %%%%%% BMS part
@@ -30,11 +30,8 @@ p(textlength+1).
 % Phrase length
 l(I,J-I) :- p(I), p(J), I<J, J <= textlength+1, not p(Z) : Z=I+1..J-1.
 
-% Guess referenced intervals
-{ q(J,L) : L=2..textlength+1-J } :- J=1..textlength-1.
-
-% Channeling constraints
-:- not q(J,L), r(I,J), l(I,L), L > 1.
+% Auxiliary atoms of referenced intervals
+q(J,L) :- r(I,J), l(I,L), L > 1.
 
 % Start and end at phrase boundaries
 :- l(J,L), q(J,L).
